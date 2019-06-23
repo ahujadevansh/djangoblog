@@ -1,0 +1,21 @@
+{% extends 'blog/base.html' %}
+{% block title %}
+    Delete-Post
+{% endblock title %}
+{% block bodycontent %}
+    <div class="container">
+        <form method='POST'>
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class='border-bottom mb-2 '>Delete Post</legend>
+                <h2>Are you sure?</h2>
+                <h5 class="text-muted">Are you sure you want to delete the selected "{{ object.title }}" Post?</h5>
+            </fieldset>
+            <div class='form-group'>
+                <input class='btn btn-outline-danger ' type="submit" value="Yes, I'm sure">
+                <a class='btn btn-outline-primary' href="{% url 'blog_post_detail' object.pk %}">No,take me back</a>
+            </div>
+        </form>
+
+    </div>
+{% endblock bodycontent %}

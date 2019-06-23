@@ -1,0 +1,62 @@
+{% extends 'blog/base.html' %}
+{% block title %}
+    blog-home
+{% endblock title %}
+{% block bodycontent %}
+    <div class="container-fluid">
+        {% for post in posts %}
+            <article class="media border rounded shadow p-3 my-2 bg-white">
+                <img class="rounded-circle img-fluid" style="height:50px;width:50px" src="{{ post.author.profile.profile_pic.url }}" alt="author profile pic">
+                <div class="media-body pl-2">
+                    <h4><a href="{% url 'blog_post_user' post.author %}">{{ post.author }}</a><small><i> posted on {{ post.date_posted|date:"d F, Y" }}</i></small></h4><hr>
+                    <h2 class="text-break" ><a href="{% url 'blog_post_detail' post.pk %}">{{ post.title|title}}</h2></a>
+                    <small class="text-muted">last updated {{ post.last_updated|date:"d F, Y" }}</small>
+                    {% autoescape on %}
+                        {% if post.content|wordcount > 70 %}
+                            <p class="text-break" id="{{post.id}}" >{{post.content|linebreaksbr|urlize|truncatewords:70}}</p>
+                            <a href="{% url 'blog_post_detail' post.pk %}" class="btn btn-primary" >Read More</a>
+                        {% elif post.content|length > 375 %}
+                            <p class="text-break" id="{{post.id}}" >{{post.content|linebreaksbr|urlize|truncatechars:375}}</p>
+                            <a href="{% url 'blog_post_detail' post.pk %}" class="btn btn-primary" >Read More</a>
+                        {% else %}
+                            <p class="text-break">{{post.content|linebreaksbr|urlize}}</p>
+                        {% endif %}
+                    {% endautoescape %}
+                </div>
+            </article>
+            {% empty %}
+                <div class="alt alt-secondary border p-3 m-2" >
+                    <h4>No Posts Yet</h4>
+                    <a class="btn btn-secondary" href="{% url 'blog_post_create' %}">Add a post</a>
+                </div>
+        {% endfor %}
+        <ul class="pagination pagination justify-content-end p-3 m-3">
+            {% if is_paginated %}
+
+                {% if page_obj.has_previous %}
+                    <li class="page-item "><a class="page-link" href="?page=1">First</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link disabled" href="">Previous</a></li>
+                {% endif %}
+
+                {% for i in page_obj.paginator.page_range %}
+                    {% if i == page_obj.number %}
+                        <li class="page-item active"><a class="page-link" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a></li>
+                    {% elif i >  page_obj.number|add:-3 and i < page_obj.number|add:3 %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages}}">Last</a></li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+                {% endif %}
+
+            {% endif %}
+        </ul>
+    </div>
+
+{% endblock bodycontent %}
