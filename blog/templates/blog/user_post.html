@@ -1,0 +1,49 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}
+    blog-{{ posts.first.author }}-posts
+{% endblock title %}
+{% block bodycontent %}
+    <div class="container">
+        {% for post in posts %}
+            {% if forloop.first %}
+                <div class="media border rounded shadow p-3 m-2">
+                    <img class="img-thumbnail rounded-circle img-fluid" style="height:125px;width:125px" src="{{ post.author.profile.profile_pic.url }}" alt="user profile pic">
+                    <div class="media-body p-4">
+                        <h2>{{post.author.first_name|title}} {{post.author.last_name|title}}</h2>
+                        <h3>
+                            {{ page_obj.paginator.count }} Post{{ page_obj.paginator.count|pluralize }}
+                            by {{ view.kwargs.username }}
+                        </h3>
+                    </div>
+                </div>
+            {% endif %}
+            <article class="media border rounded shadow p-3 m-2 bg-white">
+                <img class="rounded-circle img-fluid" style="height:50px;width:50px" src="{{ post.author.profile.profile_pic.url }}" alt="author profile pic">
+                <div class="media-body pl-2">
+                    <h4 class="text-break"><a href="{% url 'blog_post_user' post.author %}">{{ post.author }}</a><small><i> posted on {{ post.date_posted|date:"F d, Y" |naturalday }}</i></small></h4><hr>
+                    <h2><a href="{% url 'blog_post_detail' post.pk %}">{{ post.title|title}}</h2></a>
+                    <small class="text-muted">last updated {{ post.last_updated|naturalday }}</small>
+                    {% if post.post_pic != 'nopic.jpg' %}
+                        <br>
+                        <img src="{{ post.post_pic.url }}" class="rounded img-fluid" style="height:200px;width:300px">
+                    {% endif %}
+                    {% if post.content|wordcount > 70 %}
+                        <p class="text-break" id="{{post.id}}" >{{post.content|safe|linebreaksbr|urlize|truncatewords:70}}</p>
+                        <a href="{% url 'blog_post_detail' post.pk %}" class="btn btn-primary" >Read More</a>
+                    {% else %}
+                        <p class="text-break">{{post.content|safe|linebreaksbr|urlize}}</p>
+                    {% endif %}
+                </div>
+            </article>
+            {% empty %}
+                <div class="p-3 m-2" >
+                    <h4>Sorry, no Posts</h4>
+                    <a class="btn btn-secondary m-1" href="{% url 'blog_post_create' %}">Post <i class="fas fa-plus-circle" ></i></a>
+                </div>
+        {% endfor %}
+    </div>
+    {% include "blog/paginate.html" %}
+    
+{% endblock bodycontent %}

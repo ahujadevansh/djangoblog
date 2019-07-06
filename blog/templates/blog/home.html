@@ -1,0 +1,40 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}
+    blog-home
+{% endblock title %}
+
+{% block bodycontent %}
+    <div class="container-fluid">
+        {% for post in posts %}
+            <article class="media border rounded shadow p-3 my-2 bg-white">
+                <img class="rounded-circle img-fluid" style="height:50px;width:50px" src="{{ post.author.profile.profile_pic.url }}" alt="author profile pic">
+                <div class="media-body pl-2">
+                    <h4><a href="{% url 'blog_post_user' post.author %}">{{ post.author }}</a><small><i> posted on {{ post.date_posted|date:"F d, Y"}}</i></small></h4><hr>
+                    <h2 class="text-break" ><a href="{% url 'blog_post_detail' post.pk %}">{{ post.title|title}}</h2></a>
+                    <small class="text-muted">last updated {{ post.last_updated|naturalday}}</small>
+                    {% if post.post_pic != 'nopic.jpg' %}
+                        <br>
+                        <img src="{{ post.post_pic.url }}" class="rounded img-fluid" style="height:200px;width:300px">
+                    {% endif %}
+                    {% autoescape on %}
+                        {% if post.content|wordcount > 70 %}
+                            <p class="text-break" id="{{post.id}}" >{{post.content|safe|linebreaksbr|urlize|truncatewords:70}}</p>
+                            <a href="{% url 'blog_post_detail' post.pk %}" class="btn btn-primary" >Read More</a>
+                        {% else %}
+                            <p class="text-break">{{post.content|safe|linebreaksbr|urlize}}</p>
+                        {% endif %}
+                    {% endautoescape %}
+                </div>
+            </article>
+            {% empty %}
+                <div class="alt alt-secondary border p-3 m-2" >
+                    <h4>No Posts Yet</h4>
+                    <a class="btn btn-secondary" href="{% url 'blog_post_create' %}">Add a post</a>
+                </div>
+        {% endfor %}
+        {% include "blog/paginate.html" %}
+    </div>
+
+{% endblock bodycontent %}

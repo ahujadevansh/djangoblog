@@ -1,0 +1,63 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% load humanize %}
+<!-- load url_encoded filter from urlify.py -->
+{% load urlify %}       
+
+
+
+{% block title %}
+    post-{{ object.title|title }}
+{% endblock title %}
+
+
+{% block bodycontent %}
+    <div class="container">
+        <article class="media border rounded shadow p-3 m-2 bg-white">
+            <img class="rounded-circle img-fluid" style="height:50px;width:50px" src="{{ object.author.profile.profile_pic.url }}" alt="author profile pic">
+            <div class="media-body pl-2">
+                <h4><a href="{% url 'blog_post_user' post.author %}">{{ object.author }}</a><small><i> posted on {{ object.date_posted|date:"F d, Y" |naturalday }}</i></small></h4><hr>
+                <h2 class="text-primary text-break">{{ object.title|title }}</h2>
+                <small class="text-muted">last updated {{ object.last_updated|naturalday }}</small>
+                
+                {% if object.post_pic != 'nopic.jpg' %}
+                    <br>
+                    <img src="{{ object.post_pic.url }}" class="rounded img-fluid" style="height:200px;width:300px">
+                {% endif %}
+
+                <p class="text-break" >{{object.content|safe|linebreaksbr|default:"nothing"|urlize}}</p>
+                
+                <div class="clearfix">                  
+                    {% with content_url_encoded=object.content|url_encoded title_url_encoded=object.title|url_encoded %}
+
+                        <a class=" fas far fas fa-share btn btn-primary pd-1 float-right" href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}">
+                            Facebook
+                        </a>
+
+                        <!-- <a href="https://twitter.com/home?status={{ content_url_encoded }}%20{{ request.build_absolute_uri }}">
+                            Twitter
+                        </a>
+                        
+                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ title_url_encoded }}&summary={{ content_url_encoded }}&source={{ request.build_absolute_uri }}">
+                            Linkedin
+                        </a>
+
+                        <a href="http://www.reddit.com/submit?url={{ request.build_absolute_uri }}&title={{ title_url_encoded }}">
+                            Reddit
+                        </a> -->
+                        
+                    {% endwith %}
+                </div>
+                <div class="clearfix"> 
+                    {% if object.author == user %}
+                        <hr>
+                        <a class="btn btn-sm btn-danger mx-auto float-right" href="{% url 'blog_post_delete' object.pk %}"> <i class="fas fa-trash"> </i> Delete</a>
+                        <a class="btn btn-sm btn-info mx-1 float-right" href="{% url 'blog_post_update' object.pk %}"> <i class="fas fa-edit"></i> Update</a>  
+                    {% endif %}
+                </div>
+
+                
+            </div>
+        </article>
+    </div>
+{% endblock bodycontent %}
